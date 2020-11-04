@@ -39,16 +39,21 @@ public class ThirdPersonCamera : MonoBehaviour
     //* inspector serialized
     #region Variables (private)
     [SerializeField]
-    private float distanceAway;
+    private float distanceAway = 0.0f;
     [SerializeField]
-    private float distanceUp;
+    private float distanceUp = 0.0f;
     [SerializeField]
     private Transform followXForm;
     [SerializeField]
     private float firstPersonThreshold = 0.5f;
     [SerializeField]
     private CharacterControllerLogic follow;
-
+    [SerializeField]
+    private float firstPersonLookSpeed = 1.5f;
+    [SerializeField]
+    private Vector2 firstPersonXAxisClamp = new Vector2(-70.0f, 90.0f);
+    [SerializeField]
+    private float fPSRotationDegreePerSecond = 120f;
 
     //* smoothing and damping
     private Vector3 velocityCamSmooth = Vector3.zero;
@@ -64,12 +69,12 @@ public class ThirdPersonCamera : MonoBehaviour
     private float lookWeight;
     private const float TARGETING_THRESHOLD = 0.01f;
 
-    public CharacterControllerLogic Follow { get => follow; set => follow = value; }
-    public CharacterControllerLogic Follow1 { get => follow; set => follow = value; }
-
     #endregion
 
     #region Properties (poublic)
+    public CamStates CamState { get => camState; set => camState = value; }
+    public float LookWeight { get => lookWeight; set => lookWeight = value; }
+    internal CameraPosition FirstPersonCamPos { get => firstPersonCamPos; set => firstPersonCamPos = value; }
 
     public enum CamStates
     {
@@ -86,7 +91,7 @@ public class ThirdPersonCamera : MonoBehaviour
     void Start()
     {
 
-        Follow = GameObject.FindWithTag("Player").GetComponent<CharacterControllerLogic>();
+        follow = GameObject.FindWithTag("Player").GetComponent<CharacterControllerLogic>();
 
         followXForm = GameObject.FindWithTag("Player").transform;
 
@@ -103,37 +108,41 @@ public class ThirdPersonCamera : MonoBehaviour
         float rightY = Input.GetAxis("RightStickY");
         float leftX = Input.GetAxis("Horizontal");
         float leftY = Input.GetAxis("Vertical");
+
         Vector3 characterOffset = followXForm.position + new Vector3(0f, distanceUp, 0f);
+        Vector3 lookAt = characterOffset;
 
         // determine camera state
         if (Input.GetAxis("Target") > TARGETING_THRESHOLD)
         {
-            camState = CamStates.Target;
+            CamState = CamStates.Target;
         }
-        else
+        // first person
+        if (rightY > firstPersonThreshold & !follow.IsAnimatorState("Locomotion"))
         {
-            // first person
-            if (rightY > firstPersonThreshold & !follow.IsAnimatorState("Locomotion"))
-            {
-                // reset look before entering the first person mode
-                xAxisRot = 0;
-                lookWeight = 0f;
-                camState = CamStates.FirstPerson;
-            }
-
-            // behind the back
-            if ((camState == CamStates.FirstPerson && Input.GetButton("ExitFPV")) ||
-            (camState == CamStates.Target && (Input.GetAxis("Target") <= TARGETING_THRESHOLD)))
-            {
-                camState = CamStates.Behind;
-            }
-
+            // reset look before entering the first person mode
+            xAxisRot = 0f;
+            lookWeight = 0f;
+            CamState = CamStates.FirstPerson;
         }
+
+        // behind the back
+        if ((CamState == CamStates.FirstPerson && Input.GetButton("ExitFPV")) ||
+        (CamState == CamStates.Target && (Input.GetAxis("Target") <= TARGETING_THRESHOLD)))
+        {
+            StartCoroutine(BehindTransition());
+        }
+
+
+        // // set the Look At Weight - amount to use look at IK vs using the heads animation
+        //! moved to onAnimatorIK()
+        // follow.Animator.SetLookAtWeight(lookWeight);
 
         // execute camera state
-        switch (camState)
+        switch (CamState)
         {
             case CamStates.Behind:
+                ResetCamera();
                 // calculate direction from camera to player, kill y, and normalize to give a valid direction with unit magnitude
                 lookDir = characterOffset - this.transform.position;
                 lookDir.y = 0;
@@ -145,15 +154,46 @@ public class ThirdPersonCamera : MonoBehaviour
                 Debug.DrawLine(followXForm.position, targetPosition, Color.magenta);
                 break;
             case CamStates.Target:
+                ResetCamera();
                 lookDir = followXForm.forward;
-
+                targetPosition = characterOffset + followXForm.up * distanceUp - lookDir * distanceAway;
                 break;
             case CamStates.FirstPerson:
-                Debug.Log("in first person", this);
+                // looking up and down
+                // calculate the amount of rotation and apply to the firstPersonCamPos GameObject
+                xAxisRot += (leftY * firstPersonLookSpeed);
+                xAxisRot = Mathf.Clamp(xAxisRot, firstPersonXAxisClamp.x, firstPersonXAxisClamp.y);
+                firstPersonCamPos.XForm.localRotation = Quaternion.Euler(xAxisRot, 0, 0);
+
+                // superimpose firstPersonCamPos GameObect's rotation on camera
+                Quaternion rotationShift = Quaternion.FromToRotation(this.transform.forward, firstPersonCamPos.XForm.forward);
+                this.transform.rotation = rotationShift * this.transform.rotation;
+
+                // move character model's head
+                //! moved to onAnimatorIK()
+                // follow.Animator.SetLookAtPosition(firstPersonCamPos.XForm.position + firstPersonCamPos.XForm.forward);
+                lookWeight = Mathf.Lerp(lookWeight, 1.0f, Time.deltaTime * firstPersonLookSpeed);
+
+                // look left and right
+                // similarly to how character is rotated while in locomotion, use Quaternion + add rotation to character
+                Vector3 rotationAmount = Vector3.Lerp(Vector3.zero, new Vector3(0f, fPSRotationDegreePerSecond * (leftX < 0f ? -1f : 1f), 0f), Mathf.Abs(leftX));
+                Quaternion deltaRotation = Quaternion.Euler(rotationAmount * Time.deltaTime);
+                follow.transform.rotation = (follow.transform.rotation * deltaRotation);
+
+                // move camera to firstPersonCamPos
+                targetPosition = firstPersonCamPos.XForm.position;
+
+                // smoothly transition look direction towards firstPersonCamPos when entering first person mode
+                lookAt = Vector3.Lerp(targetPosition + followXForm.forward, this.transform.position + this.transform.forward, camSmoothDampTime * Time.deltaTime);
+                Debug.DrawRay(Vector3.zero, lookAt, Color.black);
+                Debug.DrawRay(Vector3.zero, targetPosition + followXForm.forward, Color.white);
+                Debug.DrawRay(Vector3.zero, firstPersonCamPos.XForm.position + firstPersonCamPos.XForm.forward, Color.cyan);
+
+                // choose lookat target based on distance
+                lookAt = Vector3.Lerp(this.transform.position + this.transform.forward, lookAt, Vector3.Distance(this.transform.position, firstPersonCamPos.XForm.position));
                 break;
         }
 
-        targetPosition = characterOffset + followXForm.up * distanceUp - lookDir * distanceAway;
 
 
         CompensateForWalls(characterOffset, ref targetPosition);
@@ -161,10 +201,7 @@ public class ThirdPersonCamera : MonoBehaviour
         smoothPosition(this.transform.position, targetPosition);
 
         // make sure the camera is looking the right way
-        transform.LookAt(followXForm);
-
-        Debug.Log(camState);
-        // Debug.Log(rightY);
+        transform.LookAt(lookAt);
     }
 
     #endregion
@@ -188,6 +225,23 @@ public class ThirdPersonCamera : MonoBehaviour
             toTarget = new Vector3(wallHit.point.x, toTarget.y, wallHit.point.z);
         }
     }
+
+    private void ResetCamera()
+    {
+        lookWeight = Mathf.Lerp(lookWeight, 0.0f, Time.deltaTime * firstPersonLookSpeed);
+        transform.localRotation = Quaternion.Lerp(transform.localRotation, Quaternion.identity, Time.deltaTime);
+    }
+
+    IEnumerator BehindTransition()
+    {
+        CamState = CamStates.Target;
+        yield return new WaitForSeconds(0.1f);
+        if (CamState == CamStates.Target)
+        {
+            yield return CamState = CamStates.Behind;
+        }
+    }
+
 
     #endregion
 }

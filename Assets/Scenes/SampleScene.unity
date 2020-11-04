@@ -2276,6 +2276,9 @@ MonoBehaviour:
   followXForm: {fileID: 1708286618}
   firstPersonThreshold: 0.5
   follow: {fileID: 1708286619}
+  firstPersonLookSpeed: 3
+  firstPersonXAxisClamp: {x: -70, y: 60}
+  fPSRotationDegreePerSecond: 120
   camSmoothDampTime: 0.1
 --- !u!114 &963194230
 MonoBehaviour:
@@ -4811,113 +4814,41 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1633175350, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1708286619, guid: 670a3f206278c184487fe486fa254187, type: 3}
       propertyPath: gamecam
       value: 
       objectReference: {fileID: 963194229}
-    - target: {fileID: 1708286619, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: directionSpeed
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: sceneViewFollowers.Array.data[0].enableFixedRotation
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: onlyInPlayMode
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
       propertyPath: sceneViewFollowers.Array.data[0].fixedRotation.x
       value: 90
-      objectReference: {fileID: 0}
-    - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: sceneViewFollowers.Array.data[0].positionOffset.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: sceneViewFollowers.Array.data[0].positionOffset.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: sceneViewFollowers.Array.data[0].positionOffset.y
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
       propertyPath: sceneViewFollowers.Array.data[0].fixedRotation.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: sceneViewFollowers.Array.data[0].fixedRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: on
-      value: 1
+      propertyPath: sceneViewFollowers.Array.data[0].size
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
       propertyPath: sceneViewFollowers.Array.data[0].orthographic
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: sceneViewFollowers.Array.data[0].enable
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1708286620, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: sceneViewFollowers.Array.data[0].size
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1212182492522221795, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: m_Radius
-      value: 0.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 1212182492522221795, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: m_Height
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1212182492522221795, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: m_Center.y
-      value: 0.8
-      objectReference: {fileID: 0}
     - target: {fileID: 1212182492522221795, guid: 670a3f206278c184487fe486fa254187, type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7745314120679898601, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: m_Center.y
+    - target: {fileID: 8803741961027751949, guid: 670a3f206278c184487fe486fa254187, type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: aef9e0d7fbf9f924091a41b93ff4fa44, type: 3}
+    - target: {fileID: 8803741961027751949, guid: 670a3f206278c184487fe486fa254187, type: 3}
+      propertyPath: m_ApplyRootMotion
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7745314120679898601, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: m_Size.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7745314120679898601, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: m_Size.z
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7745314120679898601, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: m_Size.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7745314120679898601, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: m_Center.z
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8803741961037276109, guid: 670a3f206278c184487fe486fa254187, type: 3}
       propertyPath: m_Name
       value: Beta
-      objectReference: {fileID: 0}
-    - target: {fileID: 8803741961037276109, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: m_TagString
-      value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 8803741961037276109, guid: 670a3f206278c184487fe486fa254187, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8803741961037316077, guid: 670a3f206278c184487fe486fa254187, type: 3}
       propertyPath: m_LocalPosition.x

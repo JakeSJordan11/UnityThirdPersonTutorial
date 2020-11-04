@@ -12,7 +12,7 @@ public class CharacterControllerLogic : MonoBehaviour
     [SerializeField]
     private float directionDampTime = .25f;
     [SerializeField]
-    private ThirdPersonCamera gamecam;
+    private ThirdPersonCamera gamecam = null;
     [SerializeField]
     private float directionSpeed = 3.0f;
     [SerializeField]
@@ -23,6 +23,19 @@ public class CharacterControllerLogic : MonoBehaviour
     private float direction = 0.0f;
     private float horizontal = 0.0f;
     private float vertical = 0.0f;
+
+    #endregion
+
+    #region Properties (public)
+
+    public Animator Animator
+    {
+        get
+        {
+            return this.animator;
+        }
+    }
+
 
     #endregion
 
@@ -40,7 +53,7 @@ public class CharacterControllerLogic : MonoBehaviour
 
     void Update()
     {
-        if (animator)
+        if (animator && gamecam.CamState != ThirdPersonCamera.CamStates.FirstPerson)
         {
             // pull values from controller/keyboard
             horizontal = Input.GetAxis("Horizontal");
@@ -70,6 +83,13 @@ public class CharacterControllerLogic : MonoBehaviour
 
         // Debug.Log(IsAnimatorState("Locomotion"));
     }
+
+    void OnAnimatorIK()
+    {
+        Animator.SetLookAtWeight(gamecam.LookWeight);
+        Animator.SetLookAtPosition(gamecam.FirstPersonCamPos.XForm.position + gamecam.FirstPersonCamPos.XForm.forward);
+    }
+
 
     #endregion
 

@@ -1,35 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1633175350
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1633175351}
-  m_Layer: 0
-  m_Name: Follow
-  m_TagString: Player
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1633175351
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1633175350}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 8803741961037316077}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8803741961037275713
 GameObject:
   m_ObjectHideFlags: 0
@@ -2214,7 +2184,7 @@ GameObject:
   - component: {fileID: 1708286620}
   m_Layer: 0
   m_Name: Beta
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2232,7 +2202,6 @@ Transform:
   m_Children:
   - {fileID: 8803741961037316075}
   - {fileID: 8803741961037315681}
-  - {fileID: 1633175351}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2281,10 +2250,10 @@ CapsuleCollider:
   m_Material: {fileID: 13400000, guid: 8807a7d97971734408d2dea27600b2c7, type: 2}
   m_IsTrigger: 0
   m_Enabled: 0
-  m_Radius: 0.4
+  m_Radius: 0.3
   m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: 0.97, z: 0}
+  m_Center: {x: 0, y: 0.8, z: 0}
 --- !u!65 &7745314120679898601
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2296,8 +2265,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.5, y: 2, z: 0.5}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &1708286619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2310,10 +2279,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3890fa3e7c8a1ba4599118d6ff1efe03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
+  animator: {fileID: 8803741961027751949}
   directionDampTime: 0.25
   gamecam: {fileID: 0}
-  directionSpeed: 3
+  directionSpeed: 5
   rotationDegreePerSecond: 120
 --- !u!114 &1708286620
 MonoBehaviour:
@@ -2328,15 +2297,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   on: 1
-  onlyInPlayMode: 1
+  onlyInPlayMode: 0
   sceneViewFollowers:
   - enable: 1
-    positionOffset: {x: 0, y: 10, z: 0}
+    positionOffset: {x: 0, y: 0, z: 0}
     enableFixedRotation: 1
     fixedRotation: {x: 90, y: 0, z: 0}
     targetTransform: {fileID: 8803741961037316077}
-    size: 0.01
-    orthographic: 0
+    size: 10
+    orthographic: 1
     sceneViewIndex: 0
 --- !u!1 &8803741961037276111
 GameObject:
