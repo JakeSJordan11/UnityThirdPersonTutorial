@@ -17,13 +17,15 @@ public class CharacterControllerLogic : MonoBehaviour
     private float directionSpeed = 3.0f;
     [SerializeField]
     private float rotationDegreePerSecond = 120f;
+    [SerializeField]
+    private float speedDampTime = 0.05f;
 
     //* private global only
     private float speed = 0.0f;
     private float direction = 0.0f;
     private float horizontal = 0.0f;
     private float vertical = 0.0f;
-
+    private float charAngle = 0.0f;
     #endregion
 
     #region Properties (public)
@@ -63,13 +65,32 @@ public class CharacterControllerLogic : MonoBehaviour
             horizontal = Input.GetAxis("Horizontal");
             vertical = Input.GetAxis("Vertical");
 
+            charAngle = 0f;
+            direction = 0f;
+
+
             speed = new Vector2(horizontal, vertical).sqrMagnitude;
 
-            StickToWorldspace(this.transform, gamecam.transform, ref direction, ref speed);
+            // translate controls stick coordinates into world/cam/character space
+            StickToWorldspace(this.transform, gamecam.transform, ref direction, ref speed, ref charAngle, IsAnimatorState("LocomotionPivotL") || IsAnimatorState("LocomotionPivotR"));
 
-            animator.SetFloat("Speed", speed);
+            animator.SetFloat("Speed", speed, speedDampTime, Time.deltaTime);
             animator.SetFloat("Direction", direction, directionDampTime, Time.deltaTime);
 
+            if (speed > LocomotionThreshold) // dead zone
+            {
+                if (!IsAnimatorState("LocomotionPivotL") || !IsAnimatorState("LocomotionPivotR"))
+                {
+                    Animator.SetFloat("Angle", charAngle);
+                }
+                if (speed < LocomotionThreshold && Mathf.Abs(horizontal) < 0.05f) // dead zone
+                {
+                    animator.SetFloat("direction", 0f);
+                    animator.SetFloat("Angle", 0f);
+                }
+            }
+
+            Debug.Log(IsAnimatorState("LocomotionPivotL") || IsAnimatorState("LocomotionPivotR"));
             // Debug.Log("speed = " + "[" + speed + "] " + "horizontal = " + "[" + horizontal + "]");
 
         }
@@ -99,7 +120,7 @@ public class CharacterControllerLogic : MonoBehaviour
 
     #region Methods
 
-    public void StickToWorldspace(Transform root, Transform camera, ref float directionOut, ref float speedOut)
+    public void StickToWorldspace(Transform root, Transform camera, ref float directionOut, ref float speedOut, ref float angleOut, bool isPivoting)
     {
         Vector3 rootDirection = root.forward;
 
@@ -123,6 +144,11 @@ public class CharacterControllerLogic : MonoBehaviour
 
         float angleRootToMove = Vector3.Angle(rootDirection, moveDirection) * (axisSign.y >= 0 ? -1f : 1f);
 
+        if (!isPivoting)
+        {
+            angleOut = angleRootToMove;
+        }
+
         angleRootToMove /= 180f;
 
         directionOut = angleRootToMove * directionSpeed;
@@ -132,6 +158,11 @@ public class CharacterControllerLogic : MonoBehaviour
     {
         return animator.GetCurrentAnimatorStateInfo(0).IsName(stateName);
     }
+
+    // public bool IsInPivot()
+    // {
+    //     return (animator.GetCurrentAnimatorStateInfo(0).IsName("Base.LocomotionPivotL") || animator.GetNextAnimatorStateInfo(0).IsName("Base.LocomotionPivotR"));
+    // }
 
     #endregion
 }
