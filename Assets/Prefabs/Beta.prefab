@@ -2209,6 +2209,7 @@ GameObject:
   - component: {fileID: 8803741961027751949}
   - component: {fileID: 8149626393221550918}
   - component: {fileID: 1212182492522221795}
+  - component: {fileID: 7745314120679898601}
   - component: {fileID: 1708286619}
   - component: {fileID: 1708286620}
   m_Layer: 0
@@ -2277,13 +2278,26 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8803741961037276109}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 8807a7d97971734408d2dea27600b2c7, type: 2}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: 0.4
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0.97, z: 0}
+--- !u!65 &7745314120679898601
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8803741961037276109}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1708286619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2298,6 +2312,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
   directionDampTime: 0.25
+  gamecam: {fileID: 0}
+  directionSpeed: 3
+  rotationDegreePerSecond: 120
 --- !u!114 &1708286620
 MonoBehaviour:
   m_ObjectHideFlags: 0
