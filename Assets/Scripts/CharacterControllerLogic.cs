@@ -6,7 +6,7 @@ public class CharacterControllerLogic : MonoBehaviour
 {
     #region Variables (private)
 
-    // inspector serialized
+    //* inspector serialized
     [SerializeField]
     private Animator animator;
     [SerializeField]
@@ -18,15 +18,11 @@ public class CharacterControllerLogic : MonoBehaviour
     [SerializeField]
     private float rotationDegreePerSecond = 120f;
 
-    // private global only
+    //* private global only
     private float speed = 0.0f;
     private float direction = 0.0f;
     private float horizontal = 0.0f;
     private float vertical = 0.0f;
-    private AnimatorStateInfo stateInfo;
-
-    // hashes
-    private int m_LocomotionId = 0;
 
     #endregion
 
@@ -40,9 +36,6 @@ public class CharacterControllerLogic : MonoBehaviour
         {
             animator.SetLayerWeight(1, 1);
         }
-
-        // hash all animation names for performance
-        m_LocomotionId = Animator.StringToHash("Base Layer.Locomotion");
     }
 
     void Update()
@@ -68,12 +61,14 @@ public class CharacterControllerLogic : MonoBehaviour
     void FixedUpdate()
     {
         // rotate character model if stick is tilted right or left, but only if character is moving in that direction
-        if (IsInLocomotion() && ((direction >= 0 && horizontal >= 0) || (direction < 0 && horizontal < 0)))
+        if (IsAnimatorState("Locomotion") && ((direction >= 0 && horizontal >= 0) || (direction < 0 && horizontal < 0)))
         {
             Vector3 rotationAmount = Vector3.Lerp(Vector3.zero, new Vector3(0f, rotationDegreePerSecond * (horizontal < 0f ? -1f : 1f), 0f), Mathf.Abs(horizontal));
             Quaternion deltaRotation = Quaternion.Euler(rotationAmount * Time.deltaTime);
             this.transform.rotation = (this.transform.rotation * deltaRotation);
         }
+
+        // Debug.Log(IsAnimatorState("Locomotion"));
     }
 
     #endregion
@@ -109,9 +104,9 @@ public class CharacterControllerLogic : MonoBehaviour
         directionOut = angleRootToMove * directionSpeed;
     }
 
-    public bool IsInLocomotion()
+    public bool IsAnimatorState(string stateName)
     {
-        return stateInfo.nameHash == m_LocomotionId;
+        return animator.GetCurrentAnimatorStateInfo(0).IsName(stateName);
     }
 
     #endregion
