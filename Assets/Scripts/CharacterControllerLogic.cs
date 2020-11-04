@@ -36,6 +36,10 @@ public class CharacterControllerLogic : MonoBehaviour
         }
     }
 
+    public float Speed { get => speed; set => speed = value; }
+
+    public float LocomotionThreshold { get { return 0.2f; } }
+
 
     #endregion
 

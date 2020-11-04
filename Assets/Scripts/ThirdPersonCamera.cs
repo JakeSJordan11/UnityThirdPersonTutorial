@@ -59,6 +59,9 @@ public class ThirdPersonCamera : MonoBehaviour
     private Vector3 velocityCamSmooth = Vector3.zero;
     [SerializeField]
     private float camSmoothDampTime = 0.1f;
+    private Vector3 velocityLookDir = Vector3.zero;
+    [SerializeField]
+    private float lookDirDampTime = 0.1f;
 
     //* private global only
     private Vector3 lookDir;
@@ -68,6 +71,7 @@ public class ThirdPersonCamera : MonoBehaviour
     private float xAxisRot = 0.0f;
     private float lookWeight;
     private const float TARGETING_THRESHOLD = 0.01f;
+    private Vector3 curLookDir;
 
     #endregion
 
@@ -92,8 +96,9 @@ public class ThirdPersonCamera : MonoBehaviour
     {
 
         follow = GameObject.FindWithTag("Player").GetComponent<CharacterControllerLogic>();
-
         followXForm = GameObject.FindWithTag("Player").transform;
+        lookDir = followXForm.forward;
+        curLookDir = followXForm.forward;
 
         // position and parent a GameObject where firt person view should be
         firstPersonCamPos = new CameraPosition();
@@ -144,18 +149,38 @@ public class ThirdPersonCamera : MonoBehaviour
             case CamStates.Behind:
                 ResetCamera();
                 // calculate direction from camera to player, kill y, and normalize to give a valid direction with unit magnitude
-                lookDir = characterOffset - this.transform.position;
-                lookDir.y = 0;
-                lookDir.Normalize();
-                Debug.DrawRay(this.transform.position, lookDir, Color.green);
+                // lookDir = characterOffset - this.transform.position;
+                // lookDir.y = 0;
+                // lookDir.Normalize();
+                // Debug.DrawRay(this.transform.position, lookDir, Color.green);
 
                 // setting the target position to be the correct offset from the target
-                targetPosition = characterOffset + followXForm.up * distanceUp - lookDir * distanceAway;
+                // targetPosition = characterOffset + followXForm.up * distanceUp - lookDir * distanceAway;
+                // Debug.DrawLine(followXForm.position, targetPosition, Color.magenta);
+
+                // only update camera look direction if moving
+                if (follow.Speed > follow.LocomotionThreshold && follow.IsAnimatorState("Locomotion"))
+                {
+                    lookDir = Vector3.Lerp(followXForm.right * (leftX < 0 ? 1f : -1f), followXForm.forward * (leftY < 0 ? -1f : 1f), Mathf.Abs(Vector3.Dot(this.transform.forward, followXForm.forward)));
+                    Debug.DrawRay(this.transform.position, lookDir, Color.white);
+
+                    // calculate direction from camera to player, kill y, and normalize to give a valid direction with unit magnitude
+                    curLookDir = Vector3.Normalize(characterOffset - this.transform.position);
+                    curLookDir.y = 0;
+                    Debug.DrawRay(this.transform.position, curLookDir, Color.green);
+
+                    // damping makes it so we don't update targetPosition while pivoting: camera shouldn't rotate around player
+                    curLookDir = Vector3.SmoothDamp(curLookDir, lookDir, ref velocityLookDir, lookDirDampTime);
+                }
+
+                targetPosition = characterOffset + followXForm.up * distanceUp - Vector3.Normalize(curLookDir) * distanceAway;
                 Debug.DrawLine(followXForm.position, targetPosition, Color.magenta);
+
                 break;
             case CamStates.Target:
                 ResetCamera();
                 lookDir = followXForm.forward;
+                curLookDir = followXForm.forward;
                 targetPosition = characterOffset + followXForm.up * distanceUp - lookDir * distanceAway;
                 break;
             case CamStates.FirstPerson:

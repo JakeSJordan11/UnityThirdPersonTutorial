@@ -2280,6 +2280,7 @@ MonoBehaviour:
   firstPersonXAxisClamp: {x: -70, y: 60}
   fPSRotationDegreePerSecond: 120
   camSmoothDampTime: 0.1
+  lookDirDampTime: 0.1
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
